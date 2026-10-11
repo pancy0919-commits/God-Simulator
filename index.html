@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天神模擬器 God Simulator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Courier New", Courier, monospace, monospace;
+        }
+
+        body {
+            background-color: #0d0f18;
+            color: #d1d5db;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: #f59e0b;
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+            }
+        }
+
+        .visual-panel {
+            flex: 1;
+            background: #111827;
+            border: 4px solid #374151;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            background-color: #050811;
+            border: 2px solid #1f2937;
+            image-rendering: pixelated;
+        }
+
+        .stats-box {
+            width: 100%;
+            margin-top: 15px;
+            background: #1f2937;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .stat-bar-bg {
+            width: 100px;
+            height: 10px;
+            background: #374151;
+            border: 1px solid #4b5563;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: #f59e0b;
+            width: 50%;
+            transition: width 0.3s;
+        }
+
+        .game-panel {
+            flex: 1.5;
+            background: #111827;
+            border: 4px solid #374151;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 400px;
+        }
+
+        .day-indicator {
+            color: #10b981;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #374151;
+            padding-bottom: 5px;
+        }
+
+        .story-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e5e7eb;
+            margin-bottom: 15px;
+            height: 160px;
+            overflow-y: auto;
+            padding-right: 5px;
+            background: #0b0f19;
+            padding: 10px;
+            border: 1px solid #1f2937;
+        }
+
+        .ai-response {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #60a5fa;
+            background: #061329;
+            border-left: 3px solid #3b82f6;
+            padding: 8px;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        textarea {
+            width: 100%;
+            height: 60px;
+            background: #050811;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+            padding: 8px;
+            font-size: 13px;
+            resize: none;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+
+        button {
+            background: #d97706;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #b45309;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.8;
+            width: 100%;
+            max-width: 800px;
+            border-top: 1px solid #1f2937;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GOD SIMULATOR</h1>
+        <div class="subtitle">CHAPTER 1 : GOD OF NATURE AND DESTINY</div>
+    </header>
+
+    <div class="main-container">
+        <div class="visual-panel">
+            <canvas id="pixelCanvas" width="200" height="200"></canvas>
+            
+            <div class="stats-box">
+                <div class="stat-row">
+                    <span>Ecosystem Stability:</span>
+                    <div class="stat-bar-bg"><div id="barEco" class="stat-bar-fill" style="width: 70%;"></div></div>
+                </div>
+                <div class="stat-row">
+                    <span>Faith Level:</span>
+                    <div class="stat-bar-bg"><div id="barFaith" class="stat-bar-fill" style="width: 80%;"></div></div>
+                </div>
+                <div class="stat-row">
+                    <span>Village Harmony:</span>
+                    <div class="stat-bar-bg"><div id="barHarmony" class="stat-bar-fill" style="width: 65%;"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-panel">
+            <div>
+                <div id="dayDisplay" class="day-indicator">DAY 1 / 10</div>
+                <div id="storyBox" class="story-text">
+                    [System Initialized]<br>
+                    Welcome, Deity of Nature and Destiny. Your followers in Green Field Village are facing natural challenges and resource shortages. How will you intervene using your divine powers?
+                </div>
+                <div id="aiBox" class="ai-response">
+                    [AI Logic Engine Status: Ready for divine input]
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="playerInput">Declare your divine miracle or resolution:</label>
+                <textarea id="playerInput" placeholder="Type your solution here (e.g., Move the storm clouds, plant banyan trees, make a fruit treaty...)"></textarea>
+                <button id="submitBtn">EXECUTE DIVINE WILL</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Game Developer: Guo Yanda | Sponsor: Guo Yanda</p>
+        <p>Content Inference & Narrative logic Engine powered by Gemini</p>
+        <p>Sponsoring Company: None (Independently Funded)</p>
+    </footer>
+
+    <script>
+        // Pixel Art Canvas Generator (Old God with Beard)
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrame = 0;
+
+        function drawPixelGod(frame) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const floatOffset = Math.sin(frame * 0.05) * 4;
+            
+            // Background Stars
+            ctx.fillStyle = "#ffffff";
+            if (frame % 20 < 10) ctx.fillRect(20, 30, 2, 2);
+            if (frame % 30 < 15) ctx.fillRect(170, 40, 2, 2);
+            if (frame % 25 < 12) ctx.fillRect(150, 150, 2, 2);
+            if (frame % 15 < 7)  ctx.fillRect(30, 160, 2, 2);
+
+            const startX = 60;
+            const startY = 40 + floatOffset;
+            const p = 4; // Pixel scale size
+
+            // Halo
+            ctx.fillStyle = "#fbbf24";
+            ctx.fillRect(startX + 5*p, startY - 2*p, 10*p, 2*p);
+
+            // Hair
+            ctx.fillStyle = "#e5e7eb";
+            ctx.fillRect(startX + 4*p, startY, 12*p, 4*p);
+
+            // Face
+            ctx.fillStyle = "#fca5a5";
+            ctx.fillRect(startX + 5*p, startY + 3*p, 10*p, 6*p);
+
+            // Eyes
+            ctx.fillStyle = "#1e3a8a";
+            ctx.fillRect(startX + 7*p, startY + 5*p, 2*p, 2*p);
+            ctx.fillRect(startX + 11*p, startY + 5*p, 2*p, 2*p);
+
+            // Long Beard
+            ctx.fillStyle = "#f3f4f6";
+            ctx.fillRect(startX + 4*p, startY + 8*p, 12*p, 10*p);
+            ctx.fillRect(startX + 6*p, startY + 18*p, 8*p, 4*p);
+            ctx.fillRect(startX + 8*p, startY + 22*p, 4*p, 2*p);
+
+            // Robe (Body)
+            ctx.fillStyle = "#1d4ed8";
+            ctx.fillRect(startX + 3*p, startY + 12*p, 14*p, 16*p);
+            ctx.fillStyle = "#fbbf24";
+            ctx.fillRect(startX + 9*p, startY + 12*p, 2*p, 16*p);
+
+            // Staff
+            ctx.fillStyle = "#78350f";
+            ctx.fillRect(startX + 18*p, startY + 4*p, 2*p, 26*p);
+            // Staff Orb
+            ctx.fillStyle = "#06b6d4";
+            ctx.fillRect(startX + 17*p, startY + 1*p, 4*p, 4*p);
+
+            // Aura Light Effect
+            ctx.fillStyle = "rgba(245, 158, 11, 0.1)";
+            ctx.fillRect(startX - 2*p, startY - 2*p, 24*p, 32*p);
+        }
+
+        function loop() {
+            animationFrame++;
+            drawPixelGod(animationFrame);
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // Game State & Local AI Engine
+        let currentDay = 1;
+        let stats = { eco: 70, faith: 80, harmony: 65 };
+
+        const scenarios = [
+            "DAY 1: A severe drought threatens the crops in Green Field Village.",
+            "DAY 2: High winds bring thick fog, blocking vision in the mountains.",
+            "DAY 3: Heavy rocks blocking the river construction site.",
+            "DAY 4: A sudden lightning storm threatens the spire of the newly built temple.",
+            "DAY 5: Disputes between villagers over where to place sacred items.",
+            "DAY 6: A greedy king demands the sacred tree from the village.",
+            "DAY 7: Forest depletion and declining river water level.",
+            "DAY 8: Silt clogging pipes, banyan roots damaging walls, and downstream village complaints.",
+            "DAY 9: How to organize the grand joint festival between villages?",
+            "DAY 10: Plain Village migrants arrive seeking lands, and your retirement arrives."
+        ];
+
+        const dayDisplay = document.getElementById('dayDisplay');
+        const storyBox = document.getElementById('storyBox');
+        const aiBox = document.getElementById('aiBox');
+        const playerInput = document.getElementById('playerInput');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function updateStats(e, f, h) {
+            stats.eco = Math.min(100, Math.max(0, stats.eco + e));
+            stats.faith = Math.min(100, Math.max(0, stats.faith + f));
+            stats.harmony = Math.min(100, Math.max(0, stats.harmony + h));
+
+            document.getElementById('barEco').style.width = stats.eco + '%';
+            document.getElementById('barFaith').style.width = stats.faith + '%';
+            document.getElementById('barHarmony').style.width = stats.harmony + '%';
+        }
+
+        // Lightweight Rule-based AI Engine
+        function processAI(inputText) {
+            const input = inputText.toLowerCase();
+            let ecoMod = 0;
+            let faithMod = 0;
+            let harmonyMod = 0;
+            let responseText = "";
+
+            if (input.includes("rain") || input.includes("water") || input.includes("river") || input.includes("rainstorm") || input.includes("雨") || input.includes("水")) {
+                ecoMod += 10;
+                faithMod += 5;
+                responseText += "[AI Analysis] Water intervention detected. Ecosystem stability increased. ";
+            }
+            if (input.includes("tree") || input.includes("banyan") || input.includes("plant") || input.includes("fruit") || input.includes("樹") || input.includes("芒果")) {
+                ecoMod += 15;
+                harmonyMod += 5;
+                responseText += "[AI Analysis] Ecological balance bolstered with vegetation. ";
+            }
+            if (input.includes("treaty") || input.includes("trade") || input.includes("shell") || input.includes("contract") || input.includes("條約") || input.includes("補償")) {
+                harmonyMod += 20;
+                faithMod += 10;
+                responseText += "[AI Analysis] Diplomatic consensus established. Village harmony surged. ";
+            }
+            if (input.includes("retire") || input.includes("leave") || input.includes("rest") || input.includes("退休")) {
+                faithMod += 15;
+                responseText += "[AI Analysis] Divine mandate fulfilled. The deity enters eternal rest. ";
+            }
+
+            if (responseText === "") {
+                ecoMod += 5;
+                faithMod += 5;
+                harmonyMod += 5;
+                responseText = "[AI Analysis] Miraculous decree recorded. The divine power reshapes the situation favorably.";
+            }
+
+            updateStats(ecoMod, faithMod, harmonyMod);
+            return responseText;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const text = playerInput.value.trim();
+            if (!text) return;
+
+            const aiEvaluation = processAI(text);
+            aiBox.innerText = aiEvaluation + "\nOutcome: Your divine action was executed successfully.";
+
+            playerInput.value = "";
+
+            if (currentDay < 10) {
+                currentDay++;
+                dayDisplay.innerText = "DAY " + currentDay + " / 10";
+                storyBox.innerHTML += "<br><br><b>" + scenarios[currentDay - 1] + "</b>";
+                storyBox.scrollTop = storyBox.scrollHeight;
+            } else {
+                dayDisplay.innerText = "CHAPTER 1 CONCLUDED";
+                storyBox.innerHTML += "<br><br><b>[CHAPTER COMPLETE] You have successfully guided the realm for 10 days and retired. Stay tuned for Chapter 2.</b>";
+                submitBtn.disabled = true;
+                playerInput.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
